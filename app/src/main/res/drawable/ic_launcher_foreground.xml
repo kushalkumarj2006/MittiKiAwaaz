@@ -1,0 +1,57 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Soundwaves (Voice/Awaaz arches) -->
+    <path
+        android:pathData="M 36,44 A 22,22 0 0,1 72,44"
+        android:strokeColor="#E8A838"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+
+    <path
+        android:pathData="M 26,38 A 34,34 0 0,1 82,38"
+        android:strokeColor="#E8A838"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+
+    <path
+        android:pathData="M 16,32 A 46,46 0 0,1 92,32"
+        android:strokeColor="#E8A838"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+
+    <!-- Soil Base (Dharti) -->
+    <path
+        android:pathData="M 20,80 Q 54,72 88,80 L 88,86 Q 54,82 20,86 Z"
+        android:fillColor="#8D6E63" />
+
+    <!-- Seedling / Sprout -->
+    <!-- Stem -->
+    <path
+        android:pathData="M 54,80 L 54,52"
+        android:strokeColor="#81C784"
+        android:strokeWidth="5"
+        android:strokeLineCap="round" />
+
+    <!-- Left Leaf -->
+    <path
+        android:pathData="M 54,64 C 44,64 42,52 54,52 Z"
+        android:fillColor="#4CAF50" />
+
+    <!-- Right Leaf -->
+    <path
+        android:pathData="M 54,58 C 64,58 66,46 54,46 Z"
+        android:fillColor="#2E7D32" />
+
+    <!-- Small Seed/Earth detail -->
+    <path
+        android:pathData="M 54,80 M -4,0 A 4,4 0 1,1 58,80"
+        android:fillColor="#3E2723" />
+
+</vector>
