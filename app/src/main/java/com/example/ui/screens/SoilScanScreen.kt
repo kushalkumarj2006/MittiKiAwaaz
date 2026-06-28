@@ -402,7 +402,7 @@ fun SoilScanScreen(
                                             text = ph.toString(),
                                             fontSize = 11.sp,
                                             fontWeight = FontWeight.Bold,
-                                            color = if (ph < 6.5) RaatBlue else PureWhite
+                                            color = getTextColorForPh(ph)
                                         )
                                     }
                                 }
@@ -812,7 +812,7 @@ fun HistoryScanItem(scan: SoilScan, lang: AppLanguage, onDelete: () -> Unit) {
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                         fontWeight = FontWeight.Bold,
                         fontSize = 12.sp,
-                        color = if (scan.ph < 6.5) RaatBlue else PureWhite
+                        color = getTextColorForPh(scan.ph)
                     )
                 }
             }
@@ -850,6 +850,10 @@ fun getColorForPh(ph: Double): Color {
         ph < 8.5 -> Color(0xFF00ACC1) // Teal (Alkaline)
         else -> Color(0xFF3F51B5)     // Deep Indigo (Highly Alkaline)
     }
+}
+
+fun getTextColorForPh(ph: Double): Color {
+    return if (ph < 5.5 || ph >= 8.0) PureWhite else RaatBlue
 }
 
 fun getPhLabel(ph: Double, lang: AppLanguage): String {

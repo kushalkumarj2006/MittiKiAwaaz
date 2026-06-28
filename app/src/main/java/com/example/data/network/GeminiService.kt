@@ -81,22 +81,33 @@ class GeminiService {
     suspend fun generateContent(prompt: String): String {
         val apiKey = BuildConfig.GEMINI_API_KEY.trim().removeSurrounding("\"").removeSurrounding("'")
         if (apiKey.isEmpty() || apiKey == "MY_GEMINI_API_KEY" || apiKey == "null") {
-            return getFallbackResponse(prompt)
+            return "[Offline Demo Mode]\n\n" + getFallbackResponse(prompt)
         }
 
-        return try {
-            val request = GenerateContentRequest(
-                contents = listOf(
-                    Content(parts = listOf(Part(text = prompt)))
+        var lastError: Exception? = null
+        repeat(3) { attempt ->
+            try {
+                val request = GenerateContentRequest(
+                    contents = listOf(
+                        Content(parts = listOf(Part(text = prompt)))
+                    )
                 )
-            )
-            val response = RetrofitClient.geminiApi.generateContent(apiKey, request)
-            response.candidates?.firstOrNull()?.content?.parts?.firstOrNull()?.text
-                ?: getFallbackResponse(prompt)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            getFallbackResponse(prompt)
+                val response = RetrofitClient.geminiApi.generateContent(apiKey, request)
+                val text = response.candidates?.firstOrNull()?.content?.parts?.firstOrNull()?.text
+                if (!text.isNullOrBlank()) {
+                    return text
+                }
+            } catch (e: Exception) {
+                lastError = e
+                e.printStackTrace()
+                if (attempt < 2) {
+                    kotlinx.coroutines.delay(1000L * (attempt + 1))
+                }
+            }
         }
+
+        val errorDetails = lastError?.localizedMessage ?: "Unknown API response format"
+        return "⚠️ [API Error: $errorDetails]\n\n[Offline Fallback Mode]\n\n" + getFallbackResponse(prompt)
     }
 
     private fun getFallbackResponse(prompt: String): String {

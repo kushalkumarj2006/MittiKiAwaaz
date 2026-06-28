@@ -271,7 +271,7 @@ fun MainLayout(
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = MittiGreen,
                         selectedTextColor = MittiGreen,
-                        indicatorColor = MittiGreen.copy(alpha = 0.1f)
+                        indicatorColor = MittiGreen.copy(alpha = 0.2f)
                     )
                 )
 
@@ -289,7 +289,7 @@ fun MainLayout(
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = MittiGreen,
                         selectedTextColor = MittiGreen,
-                        indicatorColor = MittiGreen.copy(alpha = 0.1f)
+                        indicatorColor = MittiGreen.copy(alpha = 0.2f)
                     )
                 )
 
@@ -307,7 +307,7 @@ fun MainLayout(
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = MittiGreen,
                         selectedTextColor = MittiGreen,
-                        indicatorColor = MittiGreen.copy(alpha = 0.1f)
+                        indicatorColor = MittiGreen.copy(alpha = 0.2f)
                     )
                 )
 
@@ -325,7 +325,7 @@ fun MainLayout(
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = MittiGreen,
                         selectedTextColor = MittiGreen,
-                        indicatorColor = MittiGreen.copy(alpha = 0.1f)
+                        indicatorColor = MittiGreen.copy(alpha = 0.2f)
                     )
                 )
             }

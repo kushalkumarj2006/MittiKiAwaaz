@@ -124,6 +124,9 @@ class MittiViewModel(
         val savedLang = try { AppLanguage.valueOf(savedLangName) } catch(e: Exception) { AppLanguage.HINDI }
         _currentLanguage.value = savedLang
 
+        val savedLocation = prefs.getString("user_location", "Ramnagar, Karnataka") ?: "Ramnagar, Karnataka"
+        _selectedLocation.value = savedLocation
+
         if (savedLoggedIn) {
             _isLoggedIn.value = true
             _loggedInPhone.value = prefs.getString("logged_in_phone", "") ?: ""
@@ -135,6 +138,21 @@ class MittiViewModel(
             if (status == TextToSpeech.SUCCESS) {
                 _isTtsInitialized.value = true
                 setTtsLanguage(_currentLanguage.value)
+                tts?.setOnUtteranceProgressListener(object : android.speech.tts.UtteranceProgressListener() {
+                    override fun onStart(utteranceId: String?) {
+                        _isSpeaking.value = true
+                    }
+                    override fun onDone(utteranceId: String?) {
+                        _isSpeaking.value = false
+                    }
+                    @Deprecated("Deprecated in Java")
+                    override fun onError(utteranceId: String?) {
+                        _isSpeaking.value = false
+                    }
+                    override fun onError(utteranceId: String?, errorCode: Int) {
+                        _isSpeaking.value = false
+                    }
+                })
             }
         }
 
@@ -190,6 +208,8 @@ class MittiViewModel(
 
     fun updateLocation(location: String) {
         _selectedLocation.value = location
+        val prefs = getApplication<Application>().getSharedPreferences("mitti_prefs", Context.MODE_PRIVATE)
+        prefs.edit().putString("user_location", location).apply()
         fetchAiWeatherForecast()
     }
 
@@ -253,6 +273,14 @@ class MittiViewModel(
             val randomPh = (52..75).random() / 10.0
             _scannedPh.value = randomPh
             _isUploadingPhImage.value = false
+            
+            // Dynamic helpful Toast
+            android.widget.Toast.makeText(
+                getApplication(),
+                "Mitti AI analyzed strip: pH $randomPh detected. Tap color chips to adjust before diagnosis.",
+                android.widget.Toast.LENGTH_LONG
+            ).show()
+
             triggerSoilScanSimulation()
         }
     }
@@ -487,17 +515,22 @@ class MittiViewModel(
     fun getResilienceScore(): Int {
         val scanList = soilScans.value
         val alertList = alerts.value
-
-        var baseScore = 75
-        // Deduct based on acidic soil scans
-        val acidicScans = scanList.count { it.ph < 6.0 }
+        
+        var baseScore = 70
+        // Add for good soil
+        val goodScans = scanList.count { it.ph in 6.0..7.5 }
+        baseScore += (goodScans * 3)
+        // Deduct for acidic
+        val acidicScans = scanList.count { it.ph < 5.5 }
         baseScore -= (acidicScans * 5)
-
-        // Deduct based on unacknowledged critical alerts
+        // Deduct for critical unacknowledged alerts
         val unackAlerts = alertList.count { !it.isAcknowledged && it.severity == "CRITICAL" }
-        baseScore -= (unackAlerts * 12)
-
-        return baseScore.coerceIn(30, 100)
+        baseScore -= (unackAlerts * 10)
+        // Add for acknowledged alerts (good village response)
+        val ackAlerts = alertList.count { it.isAcknowledged }
+        baseScore += (ackAlerts * 2)
+        
+        return baseScore.coerceIn(0, 100)
     }
 
     override fun onCleared() {

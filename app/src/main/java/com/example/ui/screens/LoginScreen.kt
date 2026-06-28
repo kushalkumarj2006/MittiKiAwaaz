@@ -145,7 +145,7 @@ fun LoginScreen(
                                     text = lang.displayName,
                                     style = MaterialTheme.typography.bodyMedium.copy(
                                         fontWeight = FontWeight.Bold,
-                                        color = if (isSelected) RaatBlue else MaterialTheme.colorScheme.onSurface
+                                        color = if (isSelected) PureWhite else RaatBlue
                                     )
                                 )
                                 Text(
@@ -156,7 +156,7 @@ fun LoginScreen(
                                         AppLanguage.MARATHI -> "मराठी"
                                     },
                                     style = MaterialTheme.typography.labelSmall.copy(
-                                        color = if (isSelected) RaatBlue.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onSurfaceVariant
+                                        color = if (isSelected) PureWhite.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 )
                             }

@@ -81,7 +81,7 @@ fun VoiceHomeScreen(
                         onClick = { viewModel.selectLanguage(lang) },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (isSelected) MittiGreen else Color.Transparent,
-                            contentColor = if (isSelected) PureWhite else MittiGreen
+                            contentColor = if (isSelected) PureWhite else RaatBlue
                         ),
                         shape = RoundedCornerShape(12.dp),
                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
