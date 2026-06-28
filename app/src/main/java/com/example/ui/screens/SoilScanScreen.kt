@@ -506,13 +506,23 @@ fun SoilScanScreen(
                                                 Icon(Icons.Default.TaskAlt, contentDescription = null, tint = HarvestGold, modifier = Modifier.size(32.dp))
                                                 Spacer(modifier = Modifier.height(6.dp))
                                                 Text(
-                                                    "PH STRIP IMAGE REGISTERED",
+                                                    when (currentLanguage) {
+                                                         AppLanguage.ENGLISH -> "PH STRIP IMAGE REGISTERED"
+                                                         AppLanguage.HINDI -> "पीएच पट्टी का चित्र पंजीकृत"
+                                                         AppLanguage.KANNADA -> "pH ಪಟ್ಟಿ ಚಿತ್ರ ನೊಂದಾಯಿಸಲಾಗಿದೆ"
+                                                         AppLanguage.MARATHI -> "pH पट्टी चित्र नोंदवले गेले"
+                                                     },
                                                     color = Color.White,
                                                     fontWeight = FontWeight.Bold,
                                                     fontSize = 12.sp
                                                 )
                                                 Text(
-                                                    "Analyzed pH: ${String.format(Locale.US, "%.1f", scannedPh)}",
+                                                    when (currentLanguage) {
+                                                         AppLanguage.ENGLISH -> "Analyzed pH: ${String.format(Locale.US, "%.1f", scannedPh)}"
+                                                         AppLanguage.HINDI -> "विश्लेषित पीएच: ${String.format(Locale.US, "%.1f", scannedPh)}"
+                                                         AppLanguage.KANNADA -> "ವಿಶ್ಲೇಷಿಸಿದ pH: ${String.format(Locale.US, "%.1f", scannedPh)}"
+                                                         AppLanguage.MARATHI -> "विश्लेषित पीएच: ${String.format(Locale.US, "%.1f", scannedPh)}"
+                                                     },
                                                     color = HarvestGold,
                                                     fontWeight = FontWeight.Bold,
                                                     fontSize = 14.sp
@@ -525,7 +535,12 @@ fun SoilScanScreen(
 
                             // Preset Soil pH Strip simulator buttons (tactile & educational fallback)
                             Text(
-                                text = "Or test with quick sample strips:",
+                                text = when (currentLanguage) {
+                                     AppLanguage.ENGLISH -> "Or test with quick sample strips:"
+                                     AppLanguage.HINDI -> "या त्वरित नमूना पट्टियों से जांचें:"
+                                     AppLanguage.KANNADA -> "ಅಥವಾ ಶೀಘ್ರ ಮಾದರಿ ಪಟ್ಟಿಗಳಿಂದ ಪರೀಕ್ಷಿಸಿ:"
+                                     AppLanguage.MARATHI -> "किंवा त्वरित नमुना पट्ट्यांसह तपासा:"
+                                 },
                                 style = MaterialTheme.typography.labelSmall,
                                 color = AshGrey,
                                 modifier = Modifier.align(Alignment.Start)
@@ -546,7 +561,17 @@ fun SoilScanScreen(
                                         .padding(8.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text("Acidic pH 5.5", fontSize = 11.sp, color = Color(0xFFD48B00), fontWeight = FontWeight.Bold)
+                                    Text(
+                                         text = when (currentLanguage) {
+                                             AppLanguage.ENGLISH -> "Acidic pH 5.5"
+                                             AppLanguage.HINDI -> "अम्लीय पीएच 5.5"
+                                             AppLanguage.KANNADA -> "ಆಮ್ಲೀಯ pH 5.5"
+                                             AppLanguage.MARATHI -> "आम्लयुक्त पीएच 5.5"
+                                         },
+                                         fontSize = 11.sp,
+                                         color = Color(0xFFD48B00),
+                                         fontWeight = FontWeight.Bold
+                                     )
                                 }
 
                                 // Neutral
@@ -560,7 +585,17 @@ fun SoilScanScreen(
                                         .padding(8.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text("Neutral pH 7.0", fontSize = 11.sp, color = Color(0xFF2E7D32), fontWeight = FontWeight.Bold)
+                                    Text(
+                                         text = when (currentLanguage) {
+                                             AppLanguage.ENGLISH -> "Neutral pH 7.0"
+                                             AppLanguage.HINDI -> "उदासीन पीएच 7.0"
+                                             AppLanguage.KANNADA -> "ತಟಸ್ಥ pH 7.0"
+                                             AppLanguage.MARATHI -> "उदासीन पीएच 7.0"
+                                         },
+                                         fontSize = 11.sp,
+                                         color = Color(0xFF2E7D32),
+                                         fontWeight = FontWeight.Bold
+                                     )
                                 }
 
                                 // Alkaline
@@ -574,7 +609,17 @@ fun SoilScanScreen(
                                         .padding(8.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text("Alkaline pH 8.2", fontSize = 11.sp, color = Color(0xFF283593), fontWeight = FontWeight.Bold)
+                                    Text(
+                                         text = when (currentLanguage) {
+                                             AppLanguage.ENGLISH -> "Alkaline pH 8.2"
+                                             AppLanguage.HINDI -> "क्षारीय पीएच 8.2"
+                                             AppLanguage.KANNADA -> "ಕ್ಷಾರೀಯ pH 8.2"
+                                             AppLanguage.MARATHI -> "क्षारयुक्त पीएच 8.2"
+                                         },
+                                         fontSize = 11.sp,
+                                         color = Color(0xFF283593),
+                                         fontWeight = FontWeight.Bold
+                                     )
                                 }
                             }
 

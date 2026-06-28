@@ -145,7 +145,7 @@ fun LoginScreen(
                                     text = lang.displayName,
                                     style = MaterialTheme.typography.bodyMedium.copy(
                                         fontWeight = FontWeight.Bold,
-                                        color = if (isSelected) PureWhite else RaatBlue
+                                        color = if (isSelected) PureWhite else MaterialTheme.colorScheme.onSurface
                                     )
                                 )
                                 Text(

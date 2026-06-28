@@ -267,14 +267,25 @@ fun MainLayout(
                             contentDescription = "Voice Assistant"
                         )
                     },
-                    label = { Text("कृषि सखी", fontSize = 10.sp, fontWeight = FontWeight.Bold) },
+                    label = {
+                        Text(
+                            text = when (currentLanguage) {
+                                AppLanguage.ENGLISH -> "Krishi Sakhi"
+                                AppLanguage.HINDI -> "कृषि सखी"
+                                AppLanguage.KANNADA -> "ಕೃಷಿ ಸಖಿ"
+                                AppLanguage.MARATHI -> "कृषी सखी"
+                            },
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = MittiGreen,
                         selectedTextColor = MittiGreen,
                         indicatorColor = MittiGreen.copy(alpha = 0.2f)
                     )
                 )
-
+ 
                 // Nav Item 2: Soil Scan
                 NavigationBarItem(
                     selected = currentScreen == "soil_scan",
@@ -285,14 +296,25 @@ fun MainLayout(
                             contentDescription = "Soil Scan"
                         )
                     },
-                    label = { Text("मिट्टी जाँच", fontSize = 10.sp, fontWeight = FontWeight.Bold) },
+                    label = {
+                        Text(
+                            text = when (currentLanguage) {
+                                AppLanguage.ENGLISH -> "Soil Scan"
+                                AppLanguage.HINDI -> "मिट्टी जाँच"
+                                AppLanguage.KANNADA -> "ಮಣ್ಣಿನ ಪರೀಕ್ಷೆ"
+                                AppLanguage.MARATHI -> "माती परीक्षण"
+                            },
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = MittiGreen,
                         selectedTextColor = MittiGreen,
                         indicatorColor = MittiGreen.copy(alpha = 0.2f)
                     )
                 )
-
+ 
                 // Nav Item 3: Disaster Warnings
                 NavigationBarItem(
                     selected = currentScreen == "disaster_alerts",
@@ -303,14 +325,25 @@ fun MainLayout(
                             contentDescription = "Warnings"
                         )
                     },
-                    label = { Text("चेतावनी", fontSize = 10.sp, fontWeight = FontWeight.Bold) },
+                    label = {
+                        Text(
+                            text = when (currentLanguage) {
+                                AppLanguage.ENGLISH -> "Warnings"
+                                AppLanguage.HINDI -> "चेतावनी"
+                                AppLanguage.KANNADA -> "ಎಚ್ಚರಿಕೆಗಳು"
+                                AppLanguage.MARATHI -> "इशारे"
+                            },
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = MittiGreen,
                         selectedTextColor = MittiGreen,
                         indicatorColor = MittiGreen.copy(alpha = 0.2f)
                     )
                 )
-
+ 
                 // Nav Item 4: Sarpanch Dashboard
                 NavigationBarItem(
                     selected = currentScreen == "sarpanch_dashboard",
@@ -321,7 +354,18 @@ fun MainLayout(
                             contentDescription = "Sarpanch"
                         )
                     },
-                    label = { Text("सरपंच", fontSize = 10.sp, fontWeight = FontWeight.Bold) },
+                    label = {
+                        Text(
+                            text = when (currentLanguage) {
+                                AppLanguage.ENGLISH -> "Sarpanch"
+                                AppLanguage.HINDI -> "सरपंच"
+                                AppLanguage.KANNADA -> "ಸರಪಂಚ"
+                                AppLanguage.MARATHI -> "सरपंच"
+                            },
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = MittiGreen,
                         selectedTextColor = MittiGreen,

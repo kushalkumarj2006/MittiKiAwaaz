@@ -34,6 +34,7 @@ fun DisasterAlertsScreen(
 ) {
     val currentLanguage by viewModel.currentLanguage.collectAsStateWithLifecycle()
     val alerts by viewModel.alerts.collectAsStateWithLifecycle()
+    val isDark = androidx.compose.foundation.isSystemInDarkTheme()
 
     var activeChecklistTitle by remember { mutableStateOf("") }
     var activeChecklistText by remember { mutableStateOf("") }
@@ -49,9 +50,10 @@ fun DisasterAlertsScreen(
     ) {
         // --- Critical Disaster Warnings Panel ---
         item {
+            val panelBg = if (isDark) Color(0xFF252538) else PureWhite
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = PureWhite),
+                colors = CardDefaults.cardColors(containerColor = panelBg),
                 shape = RoundedCornerShape(20.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -68,7 +70,12 @@ fun DisasterAlertsScreen(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Real-time alerts synced from Indian Meteorological Dept (IMD).",
+                        text = when (currentLanguage) {
+                            AppLanguage.ENGLISH -> "Real-time alerts synced from Indian Meteorological Dept (IMD)."
+                            AppLanguage.HINDI -> "भारतीय मौसम विज्ञान विभाग (IMD) से समन्वित वास्तविक समय के अलर्ट।"
+                            AppLanguage.KANNADA -> "ಭಾರತೀಯ ಹವಾಮಾನ ಇಲಾಖೆಯಿಂದ (IMD) ಪಡೆದ ಹವಾಮಾನ ಎಚ್ಚರಿಕೆಗಳು."
+                            AppLanguage.MARATHI -> "भारतीय हवामान विभागाकडून (IMD) रिअल-टाइम अलर्ट समक्रमित केले आहेत."
+                        },
                         fontSize = 12.sp,
                         color = AshGrey
                     )
@@ -78,10 +85,13 @@ fun DisasterAlertsScreen(
 
         // --- Active Red Flood Alert Section ---
         if (activeCriticalAlert != null) {
+            val alertCardBg = if (isDark) Color(0xFF3E1F1A) else DroughtRed.copy(alpha = 0.08f)
+            val alertCardTextColor = if (isDark) PureWhite else RaatBlue
+
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = DroughtRed.copy(alpha = 0.08f)),
+                    colors = CardDefaults.cardColors(containerColor = alertCardBg),
                     shape = RoundedCornerShape(20.dp),
                     border = BorderStroke(2.dp, DroughtRed)
                 ) {
@@ -95,7 +105,7 @@ fun DisasterAlertsScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = activeCriticalAlert.alertType,
+                                text = getLocalizedAlertType(activeCriticalAlert.alertType, currentLanguage),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = DroughtRed
@@ -105,9 +115,9 @@ fun DisasterAlertsScreen(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = activeCriticalAlert.message,
+                            text = getLocalizedMessage(activeCriticalAlert.message, currentLanguage),
                             fontSize = 14.sp,
-                            color = RaatBlue,
+                            color = alertCardTextColor,
                             lineHeight = 20.sp
                         )
 
@@ -123,7 +133,7 @@ fun DisasterAlertsScreen(
                             },
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
-                            color = RaatBlue
+                            color = alertCardTextColor
                         )
 
                         Spacer(modifier = Modifier.height(10.dp))
@@ -242,13 +252,23 @@ fun DisasterAlertsScreen(
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
                             Text(
-                                text = "All Clear! No critical alerts.",
+                                text = when (currentLanguage) {
+                                    AppLanguage.ENGLISH -> "All Clear! No critical alerts."
+                                    AppLanguage.HINDI -> "सब सुरक्षित है! कोई आपातकालीन चेतावनी नहीं।"
+                                    AppLanguage.KANNADA -> "ಎಲ್ಲವೂ ಸುರಕ್ಷಿತವಾಗಿದೆ! ಯಾವುದೇ ತುರ್ತು ಎಚ್ಚರಿಕೆಗಳಿಲ್ಲ."
+                                    AppLanguage.MARATHI -> "सर्व काही सुरळीत! कोणतीही गंभीर चेतावणी नाही."
+                                },
                                 fontWeight = FontWeight.Bold,
                                 color = MittiGreen,
                                 fontSize = 15.sp
                             )
                             Text(
-                                text = "Weather is normal for agricultural operations today.",
+                                text = when (currentLanguage) {
+                                    AppLanguage.ENGLISH -> "Weather is normal for agricultural operations today."
+                                    AppLanguage.HINDI -> "कृषि कार्यों के लिए आज मौसम सामान्य और अनुकूल है।"
+                                    AppLanguage.KANNADA -> "ಇಂದು ಕೃಷಿ ಚಟುವಟಿಕೆಗಳಿಗೆ ಹವಾಮಾನ ಸಾಮಾನ್ಯವಾಗಿದೆ."
+                                    AppLanguage.MARATHI -> "आज शेतीकामासाठी हवामान अनुकूल व सामान्य आहे."
+                                },
                                 color = AshGrey,
                                 fontSize = 12.sp
                             )
@@ -264,10 +284,13 @@ fun DisasterAlertsScreen(
                 visible = activeChecklistTitle.isNotEmpty(),
                 enter = fadeIn() + expandVertically()
             ) {
+                val checklistBg = if (isDark) Color(0xFF252538) else PureWhite
+                val checklistTextColor = if (isDark) PureWhite else RaatBlue
+
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = PureWhite),
+                    colors = CardDefaults.cardColors(containerColor = checklistBg),
                     border = BorderStroke(1.dp, HarvestGold)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -279,7 +302,7 @@ fun DisasterAlertsScreen(
                             Text(
                                 text = activeChecklistTitle,
                                 fontWeight = FontWeight.Bold,
-                                color = RaatBlue,
+                                color = checklistTextColor,
                                 fontSize = 15.sp
                             )
                             IconButton(onClick = { viewModel.speakOut(activeChecklistText) }) {
@@ -292,7 +315,7 @@ fun DisasterAlertsScreen(
                         Text(
                             text = activeChecklistText,
                             fontSize = 13.sp,
-                            color = RaatBlue,
+                            color = checklistTextColor,
                             lineHeight = 18.sp
                         )
                     }
@@ -317,20 +340,24 @@ fun DisasterAlertsScreen(
         }
 
         items(alerts) { alert ->
-            AlertItemRow(alert)
+            AlertItemRow(alert, currentLanguage)
         }
     }
 }
 
 @Composable
-fun AlertItemRow(alert: DisasterAlert) {
+fun AlertItemRow(alert: DisasterAlert, currentLanguage: AppLanguage) {
     val dateString = SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault()).format(Date(alert.timestamp))
     val isCritical = alert.severity == "CRITICAL"
+
+    val isDark = androidx.compose.foundation.isSystemInDarkTheme()
+    val cardBg = if (isDark) Color(0xFF252538) else PureWhite
+    val textColor = if (isDark) PureWhite else RaatBlue
 
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = PureWhite)
+        colors = CardDefaults.cardColors(containerColor = cardBg)
     ) {
         Row(
             modifier = Modifier
@@ -348,13 +375,13 @@ fun AlertItemRow(alert: DisasterAlert) {
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = alert.alertType,
+                    text = getLocalizedAlertType(alert.alertType, currentLanguage),
                     fontWeight = FontWeight.Bold,
                     fontSize = 13.sp,
-                    color = if (isCritical) DroughtRed else RaatBlue
+                    color = if (isCritical) DroughtRed else textColor
                 )
                 Text(
-                    text = alert.message,
+                    text = getLocalizedMessage(alert.message, currentLanguage),
                     fontSize = 12.sp,
                     color = AshGrey,
                     maxLines = 2
@@ -430,4 +457,41 @@ private fun getCropChecklist(lang: AppLanguage): String {
             3. कापणी केलेल्या पोत्यांना उघड्या मैदानावरून सुरक्षित व सुक्या गोदामात हलवा.
         """.trimIndent()
     }
+}
+
+fun getLocalizedAlertType(alertType: String, lang: AppLanguage): String {
+    return when (alertType) {
+        "Flood Alert" -> when (lang) {
+            AppLanguage.ENGLISH -> "Flood Alert"
+            AppLanguage.HINDI -> "बाढ़ की चेतावनी"
+            AppLanguage.KANNADA -> "ಪ್ರವಾಹದ ಮುನ್ನೆಚ್ಚರಿಕೆ"
+            AppLanguage.MARATHI -> "पुराचा इशारा"
+        }
+        "Heat Wave Warning" -> when (lang) {
+            AppLanguage.ENGLISH -> "Heat Wave Warning"
+            AppLanguage.HINDI -> "लू की चेतावनी"
+            AppLanguage.KANNADA -> "ಬಿಸಿಗಾಳಿ ಮುನ್ನೆಚ್ಚರಿಕೆ"
+            AppLanguage.MARATHI -> "उष्णतेच्या लाटेचा इशारा"
+        }
+        else -> alertType
+    }
+}
+
+fun getLocalizedMessage(message: String, lang: AppLanguage): String {
+    if (message.contains("120mm") || message.contains("heavy rainfall", ignoreCase = true)) {
+        return when (lang) {
+            AppLanguage.ENGLISH -> "IMD alerts heavy rainfall exceeding 120mm in next 48 hours. Flood warning issued for low-lying areas of River Gandak. Secure livestock and relocate pumps."
+            AppLanguage.HINDI -> "मौसम विभाग ने अगले 48 घंटों में 120 मिमी से अधिक भारी बारिश की चेतावनी दी है। गंडक नदी के निचले इलाकों के लिए बाढ़ की चेतावनी जारी। मवेशियों को सुरक्षित रखें और पंपों को स्थानांतरित करें।"
+            AppLanguage.KANNADA -> "ಮುಂದಿನ 48 ಗಂಟೆಗಳಲ್ಲಿ 120 ಮಿಮೀ ಮೀರಿ ಭಾರಿ ಮಳೆಯಾಗುವ ಮುನ್ಸೂಚನೆ ಇದೆ. ಗಂಡಕ್ ನದಿಯ ತಗ್ಗು ಪ್ರದೇಶಗಳಿಗೆ ಪ್ರವಾಹದ ಎಚ್ಚರಿಕೆ ನೀಡಲಾಗಿದೆ. ಜಾನುವಾರುಗಳನ್ನು ಸುರಕ್ಷಿತವಾಗಿರಿಸಿ ಮತ್ತು ಪಂಪ್‌ಗಳನ್ನು ಸ್ಥಳಾಂತರಿಸಿ."
+            AppLanguage.MARATHI -> "हवामान विभागाने पुढील ४८ तासांत १२० मिमी पेक्षा जास्त मुसळधार पावसाचा इशारा दिला आहे. गंडक नदीच्या सखल भागात पुराचा इशारा जारी. गुरेढोरे सुरक्षित करा आणि पंप हलवा."
+        }
+    } else if (message.contains("45") || message.contains("Heat", ignoreCase = true) || message.contains("temperature", ignoreCase = true)) {
+        return when (lang) {
+            AppLanguage.ENGLISH -> "Temperatures likely to reach 45°C this week. Ensure frequent light irrigation for standing vegetable crops in evening hours."
+            AppLanguage.HINDI -> "इस सप्ताह तापमान 45 डिग्री सेल्सियस तक पहुंचने की संभावना है। शाम के समय खड़ी सब्जी फसलों के लिए बार-बार हल्की सिंचाई सुनिश्चित करें।"
+            AppLanguage.KANNADA -> "ಈ ವಾರ ತಾಪಮಾನವು 45°C ತಲುಪುವ ಸಾಧ್ಯತೆಯಿದೆ. ಸಂಜೆಯ ಸಮಯದಲ್ಲಿ ತರಕಾರಿ ಬೆಳೆಗಳಿಗೆ ಆಗಾಗ್ಗೆ ಲಘು ನೀರಾವರಿ ಒದಗಿಸಿ."
+            AppLanguage.MARATHI -> "या आठवड्यात तापमान ४५ अंश सेल्सिअसपर्यंत पोहोचण्याची शक्यता आहे. संध्याकाळच्या वेळी उभ्या असलेल्या भाजीपाल्याला वारंवार हलके पाणी द्यावे."
+        }
+    }
+    return message
 }
