@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -373,7 +374,10 @@ fun VoiceHomeScreen(
             // Keyboard/Type Input Form
             OutlinedTextField(
                 value = textInput,
-                onValueChange = { textInput = it },
+                onValueChange = { 
+                    textInput = it
+                    viewModel.stopSpeaking()
+                },
                 placeholder = {
                     Text(
                         text = when (currentLanguage) {
@@ -385,9 +389,17 @@ fun VoiceHomeScreen(
                         fontSize = 13.sp
                     )
                 },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .onFocusChanged { focusState ->
+                        if (focusState.isFocused) {
+                            viewModel.stopSpeaking()
+                        }
+                    },
                 shape = RoundedCornerShape(24.dp),
                 colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
                     focusedBorderColor = MittiGreen,
                     unfocusedBorderColor = AshGrey.copy(alpha = 0.5f),
                     focusedContainerColor = PureWhite,

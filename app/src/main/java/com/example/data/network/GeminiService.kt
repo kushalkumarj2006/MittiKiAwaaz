@@ -3,13 +3,15 @@ package com.example.data.network
 import com.example.BuildConfig
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.http.Body
-import retrofit2.http.POST
-import retrofit2.http.Query
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.MediaType.Companion.toMediaType
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 @JsonClass(generateAdapter = true)
@@ -47,55 +49,54 @@ data class GenerateContentResponse(
     @Json(name = "candidates") val candidates: List<Candidate>? = null
 )
 
-interface GeminiApi {
-    @POST("v1beta/models/gemini-3.5-flash:generateContent")
-    suspend fun generateContent(
-        @Query("key") apiKey: String,
-        @Body request: GenerateContentRequest
-    ): GenerateContentResponse
-}
-
-object RetrofitClient {
-    private const val BASE_URL = "https://generativelanguage.googleapis.com/"
-
-    private val okHttpClient = OkHttpClient.Builder()
+class GeminiService {
+    private val client = OkHttpClient.Builder()
         .connectTimeout(60, TimeUnit.SECONDS)
         .readTimeout(60, TimeUnit.SECONDS)
         .writeTimeout(60, TimeUnit.SECONDS)
-        .addInterceptor(HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        })
         .build()
 
-    val geminiApi: GeminiApi by lazy {
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .client(okHttpClient)
-            .addConverterFactory(MoshiConverterFactory.create())
-            .build()
-            .create(GeminiApi::class.java)
-    }
-}
+    private val moshi = Moshi.Builder()
+        .addLast(KotlinJsonAdapterFactory())
+        .build()
 
-class GeminiService {
-    suspend fun generateContent(prompt: String): String {
-        val apiKey = BuildConfig.GEMINI_API_KEY.trim().removeSurrounding("\"").removeSurrounding("'")
+    suspend fun generateContent(prompt: String): String = withContext(Dispatchers.IO) {
+        val rawKey: String? = try { BuildConfig.GEMINI_API_KEY } catch (e: Throwable) { null }
+        val apiKey = rawKey?.trim()?.removeSurrounding("\"")?.removeSurrounding("'") ?: ""
         if (apiKey.isEmpty() || apiKey == "MY_GEMINI_API_KEY" || apiKey == "null") {
-            return "[Offline Demo Mode]\n\n" + getFallbackResponse(prompt)
+            return@withContext "[Offline Demo Mode]\n\n" + getFallbackResponse(prompt)
         }
 
         var lastError: Exception? = null
         repeat(3) { attempt ->
             try {
-                val request = GenerateContentRequest(
+                val requestObj = GenerateContentRequest(
                     contents = listOf(
                         Content(parts = listOf(Part(text = prompt)))
                     )
                 )
-                val response = RetrofitClient.geminiApi.generateContent(apiKey, request)
-                val text = response.candidates?.firstOrNull()?.content?.parts?.firstOrNull()?.text
-                if (!text.isNullOrBlank()) {
-                    return text
+                val requestAdapter = moshi.adapter(GenerateContentRequest::class.java)
+                val jsonRequest = requestAdapter.toJson(requestObj)
+
+                val mediaType = "application/json; charset=utf-8".toMediaType()
+                val body = jsonRequest.toRequestBody(mediaType)
+
+                val request = Request.Builder()
+                    .url("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=$apiKey")
+                    .post(body)
+                    .build()
+
+                client.newCall(request).execute().use { response ->
+                    if (!response.isSuccessful) {
+                        throw IOException("Unexpected HTTP code: ${response.code} with message: ${response.message}")
+                    }
+                    val responseBody = response.body?.string() ?: throw IOException("Empty response body")
+                    val responseAdapter = moshi.adapter(GenerateContentResponse::class.java)
+                    val contentResponse = responseAdapter.fromJson(responseBody)
+                    val text = contentResponse?.candidates?.firstOrNull()?.content?.parts?.firstOrNull()?.text
+                    if (!text.isNullOrBlank()) {
+                        return@withContext text
+                    }
                 }
             } catch (e: Exception) {
                 lastError = e
@@ -107,7 +108,7 @@ class GeminiService {
         }
 
         val errorDetails = lastError?.localizedMessage ?: "Unknown API response format"
-        return "⚠️ [API Error: $errorDetails]\n\n[Offline Fallback Mode]\n\n" + getFallbackResponse(prompt)
+        return@withContext "[Offline Demo Mode] (Connection issue: $errorDetails)\n\n" + getFallbackResponse(prompt)
     }
 
     private fun getFallbackResponse(prompt: String): String {

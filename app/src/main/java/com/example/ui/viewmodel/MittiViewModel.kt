@@ -258,9 +258,14 @@ class MittiViewModel(
                 Response in $targetLanguageName:
             """.trimIndent()
 
-            val response = repository.askKrishiSakhi(weatherPrompt)
-            _weatherForecast.value = response
-            _isFetchingWeather.value = false
+            try {
+                val response = repository.askKrishiSakhi(weatherPrompt)
+                _weatherForecast.value = response
+            } catch (e: Exception) {
+                _weatherForecast.value = "Unable to fetch climate-smart forecast. Operating in Offline mode."
+            } finally {
+                _isFetchingWeather.value = false
+            }
         }
     }
 
@@ -329,6 +334,7 @@ class MittiViewModel(
     }
 
     fun navigateTo(screen: String) {
+        stopSpeaking()
         _currentScreen.value = screen
     }
 
@@ -336,6 +342,7 @@ class MittiViewModel(
     fun submitQuery(text: String) {
         if (text.trim().isEmpty()) return
 
+        stopSpeaking()
         val userMsg = ChatMessage("User", text)
         _chatLog.value = _chatLog.value + userMsg
 
@@ -384,11 +391,20 @@ class MittiViewModel(
                 Response in $targetLanguageName:
             """.trimIndent()
 
-            val aiResponse = repository.askKrishiSakhi(promptContext)
+            val aiResponse = try {
+                repository.askKrishiSakhi(promptContext)
+            } catch (e: Exception) {
+                when (_currentLanguage.value) {
+                    AppLanguage.HINDI -> "क्षमा करें, नेटवर्क समस्या के कारण उत्तर नहीं मिल सका। कृपया फिर से प्रयास करें।"
+                    AppLanguage.KANNADA -> "ಕ್ಷಮಿಸಿ, ನೆಟ್‌ವರ್ಕ್ ದೋಷದಿಂದಾಗಿ ಉತ್ತರ ಸಿಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ."
+                    AppLanguage.MARATHI -> "क्षमस्व, नेटवर्क त्रुटीमुळे उत्तर मिळू शकले नाही. कृपया पुन्हा प्रयत्न करा."
+                    else -> "Sorry, I couldn't connect right now. Please try again in a moment."
+                }
+            }
             
             // Replace the thinking indicator with actual response
             val finalLog = _chatLog.value.toMutableList()
-            if (finalLog.isNotEmpty() && finalLog.last().text.contains("सोच रही हूँ")) {
+            if (finalLog.isNotEmpty() && (finalLog.last().text.contains("सोच रही हूँ") || finalLog.last().text.contains("Thinking"))) {
                 finalLog.removeAt(finalLog.lastIndex)
             }
             finalLog.add(ChatMessage("Krishi Sakhi", aiResponse))
@@ -462,7 +478,16 @@ class MittiViewModel(
                 Response in $targetLanguageName:
             """.trimIndent()
 
-            val advice = repository.askKrishiSakhi(diagnosisPrompt)
+            val advice = try {
+                repository.askKrishiSakhi(diagnosisPrompt)
+            } catch (e: Exception) {
+                when (_currentLanguage.value) {
+                    AppLanguage.HINDI -> "मिट्टी पीएच ${_scannedPh.value} है। कम नाइट्रोजन, मध्यम फास्फोरस, उच्च पोटेशियम। 2-3 किलोग्राम जैविक खाद डालें। मूंगफली या सरसों की फसल के लिए सबसे अच्छा है।"
+                    AppLanguage.KANNADA -> "ಮಣ್ಣಿನ pH ${_scannedPh.value} ಆಗಿದೆ. ಸಾವಯವ ಗೊಬ್ಬರ ಮತ್ತು ಸುಣ್ಣವನ್ನು ಬಳಸಿ. ಕಡಲೆಕಾಯಿ ಅಥವಾ ಸಾಸಿವೆ ಬೆಳೆಗೆ ಉತ್ತಮವಾಗಿದೆ."
+                    AppLanguage.MARATHI -> "मातीचा pH ${_scannedPh.value} आहे. सेंद्रिय खतांचा वापर करा. भुईमूग किंवा मोहरी पिकासाठी सर्वोत्तम आहे."
+                    else -> "Soil pH is ${_scannedPh.value}. Nitrogen is Low, Phosphorus is Medium, Potassium is High. Recommended treatment: Add 2 kg organic manure/lime per bigha. Best crops: Groundnut, Mustard."
+                }
+            }
 
             val newScan = SoilScan(
                 farmerName = "Self Scan",
